@@ -47,15 +47,18 @@ namespace codeAlongCS.Controllers
 
             return View();
         }
-        public ActionResult ViewCustomer(Customer postedCustomer)
+        public ActionResult ViewCustomer(string id)
         {
-            Customer customer = new Customer();
-            customer.Id = Guid.NewGuid().ToString();
-            customer.Name = postedCustomer.Name;
-            customer.Telephone = postedCustomer.Telephone;
+            Customer customer = customers.FirstOrDefault(c => c.Id == id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                return View(customer);
 
-            return View(customer);
-
+            }
         }
 
         public ActionResult AddCustomer()
@@ -72,6 +75,71 @@ namespace codeAlongCS.Controllers
 
             return RedirectToAction("customerList");
         }
+
+        public ActionResult EditCustomer(string id)
+        {
+            Customer customer = customers.FirstOrDefault(c => c.Id == id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                return View(customer);
+
+            }
+        }
+
+        [HttpPost]
+        public ActionResult EditCustomer(Customer customer, string Id)
+        {
+            Customer customerToEdit = customers.FirstOrDefault(c => c.Id == Id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                customerToEdit.Name = customer.Name;
+                customerToEdit.Telephone = customer.Telephone;
+                SaveCache();
+
+                return RedirectToAction("CustomerList");
+            }
+        }
+
+        // GET
+        public ActionResult DeleteCustomer(string id)
+        {
+            Customer customer = customers.FirstOrDefault(c => c.Id == id);
+            if (id == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                return View(customer);
+
+            }
+        }
+
+        [HttpPost, ActionName("DeleteCustomer")]
+        public ActionResult DeleteCustomer(Customer customer, string id)
+        {
+            Customer customerToDelete = customers.FirstOrDefault(c => c.Id == id);
+            if (customer == null)
+            {
+                return HttpNotFound();
+            }
+            else
+            {
+                customers.Remove(customerToDelete);
+                SaveCache();
+
+                return RedirectToAction("CustomerList");
+            }
+        }
+
 
         public ActionResult CustomerList()
         {
